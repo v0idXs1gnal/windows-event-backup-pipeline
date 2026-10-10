@@ -10,8 +10,8 @@ set "SOURCE_USER=C:\Users\<YOUR_USERNAME>"
 set "SOURCE_VMS=C:\Virtual Machines"
 
 REM Exclusions (Space-separated directory/file names)
-set "DIR_EXCLUSIONS=AppData Downloads .local"
-set "FILE_EXCLUSIONS=desktop.ini NTUSER.DAT* UsrClass.dat* *.lock *.tmp"
+set "DIR_EXCLUSIONS=AppData Downloads .local .cache"
+set "FILE_EXCLUSIONS=desktop.ini NTUSER.DAT* UsrClass.dat* *.lock *.tmp Thumbs.db ehthumbs.db ~$*"
 REM ======================================================
 
 REM Give OS time to unlock the file system on hotplug
