@@ -24,11 +24,13 @@ IF NOT EXIST "%DEST_ROOT%\" (
 
 REM *** TIME & PATH SETUP ***
 for /f %%I in ('powershell -NoProfile -Command "Get-Date -Format 'yyyy-MM-dd'"') do set TODAY=%%I
+for /f %%I in ('powershell -NoProfile -Command "(Get-Date).AddDays(-1).ToString('yyyy-MM-dd')"') do set YESTERDAY=%%I
 for /f %%W in ('powershell -NoProfile -Command "Get-Date -UFormat '%%U'"') do set WEEK_NUM=%%W
 for /f %%Y in ('powershell -NoProfile -Command "Get-Date -Format 'yyyy'"') do set YEAR=%%Y
 
 set "DEST_MIRROR=%DEST_ROOT%\Live_Mirror"
 set "DAILY_FLAG=%DEST_ROOT%\flag_%TODAY%.txt"
+set "YESTERDAY_FLAG=%DEST_ROOT%\flag_%YESTERDAY%.txt"
 set "DAILY_LOG=%DEST_ROOT%\mirror_log.txt"
 set "DAILY_RUN_LOG=%DEST_ROOT%\mirror_run_tmp.txt"
 
@@ -47,6 +49,13 @@ REM PHASE 1: DAILY MIRROR
 REM ======================================================
 IF EXIST "%DAILY_FLAG%" (
     goto CheckWeeklyArchive
+)
+
+REM Suppress midnight NTFS maintenance events if yesterday's run succeeded
+set "CURR_HOUR=%time:~0,2%"
+set "CURR_HOUR=%CURR_HOUR: =%"
+if %CURR_HOUR% lss 3 (
+    if exist "%YESTERDAY_FLAG%" exit /b 0
 )
 
 call :LogDaily "Starting Daily Mirror Backup..." > "%DAILY_RUN_LOG%"
