@@ -48,3 +48,7 @@ D:\System_Backup\
    schtasks /create /xml "C:\BackupScripts\Backup_Engine.xml" /tn "Backup_Engine" /f
    ```
 4. Verify the task is configured to run under `NT AUTHORITY\SYSTEM` with highest privileges.
+
+## License
+
+This project is released under the [0BSD License](LICENSE).
