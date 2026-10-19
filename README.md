@@ -17,7 +17,7 @@ Designed to operate unattended on workstations with removable external storage, 
 ## Directory Structure
 
 ```text
-D:\System_Backup\
+<BACKUP_DRIVE>:\System_Backup\
 ├── Live_Mirror\              # Tier 1: Daily 1:1 mirror (UserProfile, VMs)
 ├── mirror_log.txt            # Prepend run log for daily syncs
 ├── flag_YYYY-MM-DD.txt       # Daily idempotency lock
@@ -35,19 +35,20 @@ D:\System_Backup\
 ## Prerequisites & Caveats
 
 * **Script Path Hardcoding:** `Backup_Engine.xml` defaults to `C:\BackupScripts\`. If deploying to a different folder, update the `<Command>` and `<WorkingDirectory>` tags in the XML prior to importing.
-* **Drive Letter Matching:** The Event ID 98 trigger in `Backup_Engine.xml` explicitly filters for volume `D:`. If using a different drive letter, update `Data[@Name='DriveName']='D:'` in the XML **and** `TARGET_DRIVE` in `backup_engine.bat`.
+* **Dynamic Target Resolution:** The backup engine and XML event trigger automatically scan mounted volumes (`D:` through `Z:`) for the root `\System_Backup\` directory. No drive letter manual configuration is required.
 * **Power & Wake Timers:** For unattended execution from sleep, ensure **Allow wake timers** is set to **Enabled** under Windows Advanced Power Options. Timed calendar triggers can assert RTC wake; Event ID triggers fire only while the host is awake.
 * **Task History:** Enable **All Tasks History** in the Task Scheduler Actions pane to maintain an event log trail in Event Viewer under `Applications and Services Logs > Microsoft > Windows > TaskScheduler > Operational`.
 
 ## Setup & Deployment
 
 1. Clone or copy repository files to `C:\BackupScripts\`.
-2. Open `backup_engine.bat` and update configuration variables at the top (replace `<YOUR_USERNAME>` with your Windows user folder name, and adjust VM or exclusion paths as needed).
-3. Import the task via an elevated Command Prompt:
+2. Ensure your external storage contains a root folder named `System_Backup`.
+3. Open `backup_engine.bat` and update configuration variables at the top (replace `<YOUR_USERNAME>` with your Windows user folder name, and adjust VM or exclusion paths as needed).
+4. Import the task via an elevated Command Prompt:
    ```cmd
    schtasks /create /xml "C:\BackupScripts\Backup_Engine.xml" /tn "Backup_Engine" /f
    ```
-4. Verify the task is configured to run under `NT AUTHORITY\SYSTEM` with highest privileges.
+5. Verify the task is configured to run under `NT AUTHORITY\SYSTEM` with highest privileges.
 
 ## License
 

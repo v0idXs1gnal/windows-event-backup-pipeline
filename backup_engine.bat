@@ -4,8 +4,6 @@ setlocal EnableDelayedExpansion
 REM ======================================================
 REM USER CONFIGURATION (EDIT TO MATCH YOUR ENVIRONMENT)
 REM ======================================================
-set "TARGET_DRIVE=D:"
-set "DEST_ROOT=%TARGET_DRIVE%\System_Backup"
 set "SOURCE_USER=C:\Users\<YOUR_USERNAME>"
 set "SOURCE_VMS=C:\Virtual Machines"
 
@@ -17,10 +15,19 @@ REM ======================================================
 REM Give OS time to unlock the file system on hotplug
 timeout /t 5 /nobreak >nul
 
-REM Verify Backup Target Exists
-IF NOT EXIST "%DEST_ROOT%\" (
-    exit /b 1
+REM --- Auto-Detect Backup Drive ---
+set "DEST_ROOT="
+for %%D in (D E F G H I J K L M N O P Q R S T U V W X Y Z) do (
+    if exist "%%D:\System_Backup\" (
+        set "TARGET_DRIVE=%%D:"
+        set "DEST_ROOT=%%D:\System_Backup"
+        goto TargetResolved
+    )
 )
+
+:TargetResolved
+if not defined DEST_ROOT exit /b 1
+REM -------------------------------------------------------------
 
 REM *** TIME & PATH SETUP ***
 for /f %%I in ('powershell -NoProfile -Command "Get-Date -Format 'yyyy-MM-dd'"') do set TODAY=%%I
@@ -170,11 +177,11 @@ REM ======================================================
 REM LOGGING HELPERS
 REM ======================================================
 :LogDaily
-set "T=%time: =0%"
-echo [%date% %T:~0,8%] %~1
+set "T=!time: =0!"
+echo [!date! !T:~0,8!] %~1
 exit /b
 
 :LogArchive
-set "T=%time: =0%"
-echo [%date% %T:~0,8%] %~1
+set "T=!time: =0!"
+echo [!date! !T:~0,8!] %~1
 exit /b
